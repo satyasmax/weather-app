@@ -35,6 +35,7 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
   	when('/settings', {
 	  	templateUrl: 'views/settings.html', 
 	  	controller: settingsCtrl,
+	  	resolve: settingsCtrl.resolve
 		}).
 		/**
 		 * Otherwise redirect to base
@@ -70,9 +71,11 @@ value('$config',
 /**
  * App controller
  */
-run(['$rootScope', '$location', '$timeout', '$config', 'Supports', 
-function($rootScope, $location, $timeout, $config, Supports)
+run(['$rootScope', '$location', '$timeout', '$config', 'Supports', 'Storage', 
+function($rootScope, $location, $timeout, $config, Supports, Storage)
 {
+	//Storage.add('locations', '[]');
+	
 	/**
 	 * These tests checks only if the technology is supported
 	 */

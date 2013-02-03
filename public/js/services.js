@@ -5,7 +5,7 @@ WeatherApp.
 /**
  * Weather resource
  */
-factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI) 
+factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, Storage) 
 {
 	/**
 	 * Resource
@@ -19,27 +19,84 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI)
   /**
    * Get weather
    */
-  Weather.prototype.get = function () 
+  Weather.prototype.query = function () 
   {
     var deferred = $q.defer();
+    /**
+     * Always get current location first
+     */
     GeoAPI.get().
-    then(function(location)
+    then(function()
   	{
-  		Weather.get({
-  			q: 'select * from weather.forecast where woeid=' + 
-						location.ResultSet.Results[0].woeid + 
-						' and u="' + 
-						$config.deg + 
-						'"'
-  		}, 
-  		function (weather) 
-	    {
-	      deferred.resolve({
-	      	location: location.ResultSet.Results[0],
-	      	weather: weather.query.results.channel
+  		/**
+  		 * Check whether locations are set
+  		 */
+	  	if (Storage.get('locations') != '{}')
+	  	{    
+	    	var locations = angular.fromJson(Storage.get('locations'));
+		  	var calls = [];
+		    angular.forEach(locations, function(location, index)
+		  	{
+		  		calls.push(Weather.prototype.get(location.woeid));
+		  	});
+	      $q.all(calls)
+	      .then(function(results)
+	      {        
+	        var weathers = {};
+	        angular.forEach(results, function(result, index)
+	      	{
+	      		angular.forEach(result, function(weather, woeid)
+	      		{
+	      			weathers[woeid] = weather;
+	      		});
+	      	});
+	      	deferred.resolve(weathers);
 	      });
-	    })
+	  	}
+	  	/**
+	  	 * If no location is set, use current location
+	  	 */
+	  	else
+	  	{
+	  		var geo = angular.fromJson(Storage.get('geo'));
+	  		Weather.get({
+	  			q: 'select * from weather.forecast where woeid=' + 
+							geo.woeid + 
+							' and u="' + 
+							$config.deg + 
+							'"'
+	  		}, 
+	  		function (result) 
+		    {
+		    	var weather = {};
+		    	weather[geo.woeid] = result.query.results.channel;		      
+		      deferred.resolve(weather);
+		    });	  		
+	  	};
   	});
+    return deferred.promise;
+  };
+
+  /**
+   * Get weather
+   */
+  Weather.prototype.get = function (woeid) 
+  {
+    var deferred = $q.defer();
+		Weather.get({
+			q: 'select * from weather.forecast where woeid=' + 
+					woeid + 
+					' and u="' + 
+					$config.deg + 
+					'"'
+		}, 
+		function (result) 
+    {
+    	var weather = {};
+    	weather[woeid] = result.query.results.channel;
+      deferred.resolve(weather);
+    });
+
     return deferred.promise;
   };
   return new Weather;
@@ -51,7 +108,7 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI)
 /**
  * GeoAPI resource
  */
-factory('GeoAPI', function ($resource, $q, $timeout, $config) 
+factory('GeoAPI', function ($resource, $q, $timeout, $config, Storage) 
 {
 	/**
 	 * Resource
@@ -80,6 +137,7 @@ factory('GeoAPI', function ($resource, $q, $timeout, $config)
 			    location: position.coords.latitude + ',' + position.coords.longitude
 			  }, function (result) 
 		    {
+		    	Storage.add('geo', angular.toJson(result.ResultSet.Results[0]));
 		      deferred.resolve(result);
 		    });
 			},
@@ -138,9 +196,15 @@ factory('Where', function ($resource, $q, $timeout, $config)
 		var deferred = $q.defer();
     Where.get({
 	    q: q
-	  }, function (result) 
+	  }, function (results) 
     {
-      deferred.resolve(result);
+    	if (results.Found == 1)
+    	{
+    		var tmp = [];
+    		tmp.push(results.Result);
+    		results.Result = tmp;
+    	};
+      deferred.resolve(results.Result);    
     });
 		return deferred.promise;
   };
@@ -217,7 +281,7 @@ function($rootScope, $config)
   /**
    * Add in localStorage
    */
-  var setToLocalStorage = function(key, value)
+  var addToLocalStorage = function(key, value)
   {
     if (!value && 
 	    	value !== 0 && 
@@ -285,7 +349,7 @@ function($rootScope, $config)
    * Returns
    */
   return {
-    set: setToLocalStorage,
+    add: addToLocalStorage,
     get: getFromLocalStorage,
     remove: removeFromLocalStorage,
     clearAll: clearAllFromLocalStorage

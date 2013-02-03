@@ -4,8 +4,11 @@
 
   <hr>
 
-  <div class="twelve columns">
 
+
+  <div class="eight columns">
+    <h4>Search</h4>
+    <hr>
     <form ng-submit="search(q)">
         <div class="row collapse">
           <div class="ten mobile-three columns">
@@ -13,14 +16,35 @@
                     ng-model="q">
           </div>
           <div class="two mobile-one columns">
-            <a class="button expand postfix">Search</a>
+            <button type="submit" class="button expand postfix">Search</button>
           </div>
         </div>
     </form>
-
     <ul>
         <li ng-repeat="result in results">
-            {{result.city}}, {{result.country}}
+            {{result.city}}, {{result.country}} 
+            <button class="small round button" ng-click="add(result)">add to list</button>
+        </li>
+    </ul>
+  </div>
+
+
+
+  <div class="four columns">
+
+
+    <h4>Current location</h4>
+    <hr>
+    {{geo.city}}, {{geo.country}}
+
+
+    <h4>Saved locations</h4>
+    <hr>
+    <p ng-hide="locations">There are no saved locations</p>
+    <ul ng-show="locations">
+        <li ng-repeat="location in locations">
+            {{location.city}}, {{location.country}} 
+            <button class="small round alert button" ng-click="remove(location.woeid)">x</button>
         </li>
     </ul>
 

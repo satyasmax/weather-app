@@ -4,9 +4,9 @@
 /**
  * Dashboard controller
  */
-function dashboardCtrl($rootScope, $scope, $config, data)
+function dashboardCtrl($rootScope, $scope, $config, weathers)
 {
-	$scope.weather = data.weather;
+  $scope.weathers = weathers;
 };
 
 /**
@@ -14,13 +14,13 @@ function dashboardCtrl($rootScope, $scope, $config, data)
  * @type {Object}
  */
 dashboardCtrl.resolve = {
-  data: function (Weather) 
+  weathers: function (Weather) 
   {
-  	return Weather.get();
+  	return Weather.query();
   }
 };
 
 /**
  * Inject dependencies
  */
-dashboardCtrl.$inject = ['$rootScope', '$scope', '$config', 'data'];
+dashboardCtrl.$inject = ['$rootScope', '$scope', '$config', 'weathers'];
