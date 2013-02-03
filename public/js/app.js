@@ -1,11 +1,9 @@
 'use strict';
 
-
 /**
  * Init Angular App
  */
 var WeatherApp = angular.module('WeatherApp', ['ngResource']).
-
 
 
 /**
@@ -13,14 +11,17 @@ var WeatherApp = angular.module('WeatherApp', ['ngResource']).
  */
 config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider)
 {
+
 	/**
 	 * Handle cors
 	 */
 	delete $httpProvider.defaults.headers.common["X-Requested-With"];
+
 	/**
 	 * App routes
 	 */
   $routeProvider.
+
   	/**
   	 * Dashboard
   	 */
@@ -29,6 +30,7 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
 	  	controller: dashboardCtrl,
 	  	resolve: dashboardCtrl.resolve
 		}).
+
   	/**
   	 * Settings
   	 */
@@ -37,6 +39,7 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
 	  	controller: settingsCtrl,
 	  	resolve: settingsCtrl.resolve
 		}).
+
 		/**
 		 * Otherwise redirect to base
 		 */
@@ -44,7 +47,6 @@ config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvide
 	  	redirectTo: '/dashboard'
 	  });
 }]).
-
 
 
 /**
@@ -67,14 +69,12 @@ value('$config',
 }).
 
 
-
 /**
  * App controller
  */
 run(['$rootScope', '$location', '$timeout', '$config', 'Supports', 'Storage', 
 function($rootScope, $location, $timeout, $config, Supports, Storage)
 {
-	//Storage.add('locations', '[]');
 	
 	/**
 	 * These tests checks only if the technology is supported
@@ -103,39 +103,36 @@ function($rootScope, $location, $timeout, $config, Supports, Storage)
 	};
 	//
 	//
+	
   /**
    * Detect route change start
    */
   $rootScope.$on("$routeChangeStart", function (event, next, current) 
   {
-    $rootScope.alertType = "";
-    $rootScope.alertMessage = "Loading...";
-    $rootScope.active = "progress-striped active progress-warning";
+    $rootScope.status = "Loading...";
   });
+
   /**
    * Route change successfull
    */
   $rootScope.$on("$routeChangeSuccess", function (event, current, previous) 
   {
-    $rootScope.alertType = "alert-success";
-    $rootScope.alertMessage = "Successfully changed routes :]";
-    $rootScope.active = "progress-success";
+    $rootScope.status = ":]";
     $rootScope.newLocation = $location.path();
   });
+
   /**
    * Route change is failed!
    */
   $rootScope.$on("$routeChangeError", function (event, current, previous, rejection) 
   {
     alert("ROUTE CHANGE ERROR: " + rejection);
-    $rootScope.alertType = "alert-error";
-    $rootScope.alertMessage = "Failed to change routes :[";
-    $rootScope.active = "";
+    $rootScope.alertMessage = ":[";
   });
+
   /**
    * General status messages
    */
-  $rootScope.alertType = "alert-info";
-  $rootScope.alertMessage = "Welcome to the resolve demo";
+  $rootScope.status = "Welcome!";
 }]);
 

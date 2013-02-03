@@ -1,11 +1,13 @@
 'use strict';
 
-
 /**
  * Dashboard controller
  */
 function dashboardCtrl($rootScope, $scope, $config, weathers)
 {
+  /**
+   * Pass some values to view
+   */
   $scope.weathers = weathers;
 };
 

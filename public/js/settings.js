@@ -1,27 +1,37 @@
 'use strict';
 
-
 /**
  * Settings controller
  */
-function settingsCtrl($rootScope, $scope, $q, $config, home, Where, Storage)
+function settingsCtrl($rootScope, $scope, $q, $config, home, Places, Storage)
 {
+
+  /**
+   * Target is current
+   */
   var self = this;
 
+  /**
+   * Pass some values to view
+   */
   $scope.geo = angular.fromJson(Storage.get('geo'));
   $scope.locations = angular.fromJson(Storage.get('locations'));
 
+  /**
+   * Search for location
+   */
 	$scope.search = function(q)
   {
-    Where.find(q).
+    Places.find(q).
     then(function(results)
     {
-      //var results = self.readableAddresses(results.Result);
-      //console.warn('results ->', results);
       $scope.results = results;
     });
   };
 
+  /**
+   * Add location
+   */
   $scope.add = function(location)
   {
     var locations = angular.fromJson(Storage.get('locations')) || {};
@@ -30,6 +40,9 @@ function settingsCtrl($rootScope, $scope, $q, $config, home, Where, Storage)
     $scope.locations = locations;
   };
 
+  /**
+   * Remove location
+   */
   $scope.remove = function(key)
   {
     var locations = angular.fromJson(Storage.get('locations'));
@@ -52,25 +65,16 @@ settingsCtrl.resolve = {
 };
 
 /**
+ * TODO
+ * Still needed?
+ * 
  * Prototypes
  */
 settingsCtrl.prototype = {
-  constructor: settingsCtrl,
-
-  // readableAddresses: function(results)
-  // {
-  //   angular.forEach(results, function(result, index)
-  //   {
-  //     result['added'] = result.line1 + ' ' + 
-  //                       result.line2 + ' ' + 
-  //                       result.line3 + ' ' + 
-  //                       result.line4;
-  //   });
-  //   return results;
-  // }
+  constructor: settingsCtrl
 }
 
 /**
  * Inject dependencies
  */
-settingsCtrl.$inject = ['$rootScope', '$scope', '$q', '$config', 'home', 'Where', 'Storage'];
+settingsCtrl.$inject = ['$rootScope', '$scope', '$q', '$config', 'home', 'Places', 'Storage'];

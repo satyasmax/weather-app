@@ -1,7 +1,6 @@
 'use strict';
-
 /**
- * App filters for view
+ * Filters
  */
 WeatherApp.
 /**

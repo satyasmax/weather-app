@@ -1,12 +1,17 @@
 'use strict';
 
-
+/**
+ * Services & Factories
+ */
 WeatherApp.
+
+
 /**
  * Weather resource
  */
-factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, Storage) 
+factory('Weather', function ($resource, $config, $q, $route, $timeout, Places, Storage) 
 {
+
 	/**
 	 * Resource
 	 */
@@ -16,18 +21,21 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, S
     	format: 'json'
     }
   );
+
   /**
    * Get weather
    */
   Weather.prototype.query = function () 
   {
     var deferred = $q.defer();
+
     /**
      * Always get current location first
      */
-    GeoAPI.get().
+    Places.current().
     then(function()
   	{
+
   		/**
   		 * Check whether locations are set
   		 */
@@ -53,6 +61,7 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, S
 	      	deferred.resolve(weathers);
 	      });
 	  	}
+
 	  	/**
 	  	 * If no location is set, use current location
 	  	 */
@@ -73,6 +82,7 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, S
 		      deferred.resolve(weather);
 		    });	  		
 	  	};
+
   	});
     return deferred.promise;
   };
@@ -83,6 +93,10 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, S
   Weather.prototype.get = function (woeid) 
   {
     var deferred = $q.defer();
+    
+    /**
+     * Get weather of given location
+     */
 		Weather.get({
 			q: 'select * from weather.forecast where woeid=' + 
 					woeid + 
@@ -103,17 +117,23 @@ factory('Weather', function ($resource, $config, $q, $route, $timeout, GeoAPI, S
 }).
 
 
-
-
 /**
  * GeoAPI resource
  */
-factory('GeoAPI', function ($resource, $q, $timeout, $config, Storage) 
+factory('Places', function ($resource, $q, $timeout, $config, Storage) 
 {
+
 	/**
-	 * Resource
+	 * TODO
+	 * Find better ways of dealing with this!!
+	 * Initialize root resource
 	 */
-  var GeoAPI = $resource(
+	var Places = $resource();
+
+	/**
+	 * GeoAPI Resource
+	 */
+  var Geo = $resource(
     'http://where.yahooapis.com/geocode',
     {
     	flags: 'J',
@@ -121,19 +141,32 @@ factory('GeoAPI', function ($resource, $q, $timeout, $config, Storage)
     	appid: $config.appId
     }
   );
+
+	/**
+	 * Where Resource
+	 */
+  var Where = $resource(
+    'http://where.yahooapis.com/geocode',
+    {
+    	format: 'json',
+    	appid: $config.appId
+    }
+  );
+
   /**
    * Get geo location based on browser location values
    */
-  GeoAPI.prototype.get = function (coords) 
+  Places.prototype.current = function(coords) 
   {
 		var deferred = $q.defer();
 	  navigator.geolocation.getCurrentPosition(
+
 	  	/**
 	  	 * Success callback
 	  	 */
 			function(position)
 		  {	
-		    GeoAPI.get({
+		    Geo.get({
 			    location: position.coords.latitude + ',' + position.coords.longitude
 			  }, function (result) 
 		    {
@@ -141,6 +174,7 @@ factory('GeoAPI', function ($resource, $q, $timeout, $config, Storage)
 		      deferred.resolve(result);
 		    });
 			},
+
 			/**
 			 * Oh no. Something bad happened..
 			 */
@@ -162,56 +196,38 @@ factory('GeoAPI', function ($resource, $q, $timeout, $config, Storage)
 						break;
 				}				
 			}
+
 		);
 		return deferred.promise;
   };
-  return new GeoAPI;
-}).
 
-
-
-
-
-/**
- * 
- * PlaceFinder resource
- */
-factory('Where', function ($resource, $q, $timeout, $config) 
-{
-	/**
-	 * Resource
-	 */
-  var Where = $resource(
-    'http://where.yahooapis.com/geocode',
-    {
-    	format: 'json',
-    	appid: $config.appId
-    }
-  );
   /**
    * Get geo location based on browser location values
    */
-  Where.prototype.find = function (q) 
+  Places.prototype.find = function (q) 
   {
 		var deferred = $q.defer();
     Where.get({
 	    q: q
 	  }, function (results) 
     {
+    	/**
+    	 * Workaround to make one result to an array
+    	 * @type {[type]}
+    	 */
     	if (results.Found == 1)
     	{
     		var tmp = [];
     		tmp.push(results.Result);
     		results.Result = tmp;
     	};
+
       deferred.resolve(results.Result);    
     });
 		return deferred.promise;
   };
-  return new Where;
+  return new Places;
 }).
-
-
 
 
 /**
@@ -221,6 +237,7 @@ factory('Where', function ($resource, $q, $timeout, $config)
 service('Supports', 
 function($rootScope, $config)
 {
+
 	/**
 	 * Test if localStorage supported
 	 */
@@ -228,7 +245,10 @@ function($rootScope, $config)
   {
 	  try
 	  {
-	  	var mod = 'test';
+	  	/**
+	  	 * Modernizr way of doing it
+	  	 */
+	  	var mod = $config.prefix;
       localStorage.setItem(mod, mod);
       localStorage.removeItem(mod);
       return true;
@@ -238,7 +258,11 @@ function($rootScope, $config)
       return false;
 	  }
   };
+
   /**
+   * TODO
+   * Is second check really needed?
+   * 
    * Test if GeoLocation is supported
    */
   var isGeoLocationSupported = function()
@@ -253,6 +277,7 @@ function($rootScope, $config)
   		return false;
   	};
   };
+
   /**
    * Returns
    */
@@ -263,21 +288,21 @@ function($rootScope, $config)
 }).
 
 
-
-
 /**
  * localStorage service
  */
 service('Storage', ['$rootScope', '$config', 
 function($rootScope, $config)
 {
+
 	/**
-	 * Correct prefix
+	 * Correct prefix value
 	 */
   if ( $config.prefix.substr(-1) !== '.' )
   {
     var prefix = !!$config.prefix ? $config.prefix + '.' : '';
   };
+
   /**
    * Add in localStorage
    */
@@ -297,6 +322,7 @@ function($rootScope, $config)
     }
     return true;
   };
+
   /**
    * Read from localStorage
    */
@@ -306,6 +332,7 @@ function($rootScope, $config)
     if (!item) return null;
     return item;
   };
+
   /**
    * Remove from localStorage
    */
@@ -322,6 +349,7 @@ function($rootScope, $config)
     }
     return true;
   };
+
   /**
    * Clear localStorage
    */
@@ -345,6 +373,7 @@ function($rootScope, $config)
     }
     return true;
   };
+
   /**
    * Returns
    */

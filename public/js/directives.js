@@ -1,7 +1,6 @@
 'use strict';
-
 /**
- * App directives
+ * Directives
  */
 WeatherApp.
 directive('appVersion', ['$config', function($config)
