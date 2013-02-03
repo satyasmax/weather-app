@@ -4,6 +4,16 @@
 
   <hr>
 
+
+	<div class="alert-box twelve columns"
+				ng-show="advice==true">
+	  You have no locations saved. Saev your current location?
+	  <button class="small button round secondary"
+	  			ng-click="add(geo)">Save location</button>
+	  <a href="" class="close">&times;</a>
+	</div>
+
+
   <ul>
   	<li ng-repeat="weather in weathers">
 
