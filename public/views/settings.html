@@ -1,0 +1,29 @@
+<div class="row">
+  
+  <h3>Settings</h3>
+
+  <hr>
+
+  <div class="twelve columns">
+
+    <form ng-submit="search(q)">
+        <div class="row collapse">
+          <div class="ten mobile-three columns">
+            <input type="text"
+                    ng-model="q">
+          </div>
+          <div class="two mobile-one columns">
+            <a class="button expand postfix">Search</a>
+          </div>
+        </div>
+    </form>
+
+    <ul>
+        <li ng-repeat="result in results">
+            {{result.city}}, {{result.country}}
+        </li>
+    </ul>
+
+  </div>
+
+</div>

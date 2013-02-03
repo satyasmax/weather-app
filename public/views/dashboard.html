@@ -1,0 +1,62 @@
+<div class="row">
+  
+  <h3>Weather for {{weather.location.city}}</h3>
+
+  <hr>
+
+  <div class="twelve columns">
+    <dl>
+    	<dt><b>Weather</b></dt>
+    		<dd>Date: {{weather.item.pubDate}}<br><br>
+    			<ul>
+
+    				<li style="background-color:#00719E; padding:5px; margin-right: 5px; float: left;"
+    						class="three columns">
+    					NOW<br>	
+    					<img ng-src="img/icons/{{weather.item.condition.code|iconize}}.png" />
+    					<b>Code:</b> {{weather.item.condition.code}}<br>
+    					<b>Date:</b> {{weather.item.condition.date}}<br>
+    					<b>Temperature:</b> {{weather.item.condition.temp}}<br>
+    					<b>Text:</b> {{weather.item.condition.text}}<br><br>
+    				</li>
+
+    				<li ng-repeat="forecast in weather.item.forecast"
+    						style="background-color:#00719E; padding:5px; margin-right: 5px; float: left"
+    						class="four columns">
+    					<img ng-src="img/icons/{{forecast.code|iconize}}.png" />
+    					<b>Code:</b> {{forecast.code}}<br>
+    					<b>Date:</b> {{forecast.date}}, {{forecast.day}}<br>
+    					<b>Temperatures:</b> Highest; {{forecast.high}}, Lowest: {{forecast.low}}<br>
+    					<b>Text:</b> {{forecast.text}}<br><br>
+    				</li>
+
+    			</ul>	
+    		</dd>
+    </dl>
+  </div>
+
+
+  <div class="six columns">
+    <dl>
+    	<dt><b>Wind</b></dt>
+    		<dd>Chill: {{weather.wind.chill}}, Direction: {{weather.wind.direction}}, Speed: {{weather.wind.speed}}</dd>
+    		<br>
+    	<dt><b>Atmosphere</b></dt>
+    		<dd>Humidity: {{weather.atmosphere.humidity}}, Pressure: {{weather.atmosphere.pressure}}, Visibility: {{weather.atmosphere.visibility}}</dd>
+    		<br>
+    	<dt><b>Astronomoy</b></dt>
+    		<dd>Sunrise: {{weather.astronomy.sunrise}}, Sunset: {{weather.astronomy.sunset}}</dd>
+    		<br>
+    </dl>
+  </div>
+
+
+  <div class="six columns">
+    <dl>
+    	<dt><b>Location</b></dt>
+    		<dd>{{weather.location.city}}, {{weather.location.country}}</dd>
+    		<br>
+    </dl>
+  </div>
+
+</div>
