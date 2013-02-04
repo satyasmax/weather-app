@@ -31,6 +31,8 @@ function dashboardCtrl($rootScope, $scope, $config, weathers, Storage)
     Storage.add('locations', angular.toJson(locations));
     $scope.locations = locations;
   };
+
+  $scope.icons = $config.weatherIconMap;
 };
 
 /**

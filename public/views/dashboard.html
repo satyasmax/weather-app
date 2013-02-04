@@ -13,7 +13,6 @@
 	  <a href="" class="close">&times;</a>
 	</div>
 
-
   <ul>
   	<li ng-repeat="weather in weathers">
 
@@ -23,10 +22,12 @@
 		    		<dd>Date: {{weather.item.pubDate}}<br><br>
 		    			<ul>
 
-		    				<li style="background-color:#00719E; padding:5px; margin-right: 5px; float: left;"
+		    				<li 
 		    						class="three columns">
 		    					NOW<br>	
-		    					<img ng-src="img/icons/{{weather.item.condition.code|iconize}}.png" />
+		    					
+		    					<img ng-src="img/icons/{{weather.item.condition.code|iconize}}.svg" type="image/svg+xml">
+
 		    					<b>Code:</b> {{weather.item.condition.code}}<br>
 		    					<b>Date:</b> {{weather.item.condition.date}}<br>
 		    					<b>Temperature:</b> {{weather.item.condition.temp}}<br>
@@ -34,9 +35,11 @@
 		    				</li>
 
 		    				<li ng-repeat="forecast in weather.item.forecast"
-		    						style="background-color:#00719E; padding:5px; margin-right: 5px; float: left"
+		    						style="padding:5px; margin-right: 5px; float: left"
 		    						class="four columns">
-		    					<img ng-src="img/icons/{{forecast.code|iconize}}.png" />
+		    					
+		    					<img ng-src="img/icons/{{weather.item.condition.code|iconize}}.svg" type="image/svg+xml">
+
 		    					<b>Code:</b> {{forecast.code}}<br>
 		    					<b>Date:</b> {{forecast.date}}, {{forecast.day}}<br>
 		    					<b>Temperatures:</b> Highest; {{forecast.high}}, Lowest: {{forecast.low}}<br>
